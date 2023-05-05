@@ -294,13 +294,12 @@ def webdavCleanup(args, conf, jobids, webdavClient=None, webdavBase=None):
             return
 
     print('Cleaning WebDAV directories ...')
+    if webdavClient:
+        closeWebDAV = False
+    else:
+        closeWebDAV = True
+        webdavClient = getWebDAVClient(args, conf, webdavBase)
     try:
-        if webdavClient:
-            closeWebDAV = False
-        else:
-            closeWebDAV = True
-            webdavClient = getWebDAVClient(args, conf, webdavBase)
-
         errors = webdavClient.cleanJobDirs(webdavBase, jobids)
         for error in errors:
             print(error)
