@@ -3,10 +3,11 @@ import json
 import os
 import sys
 
-from act_client.common import (ACTClientError, disableSIGINT, getIDParam,
-                               getWebDAVBase)
+from pyarcrest.http import HTTPClient
+
+from act_client.common import (HTTP_BUFFER_SIZE, ACTClientError, disableSIGINT,
+                               getIDParam, getWebDAVBase)
 from act_client.config import checkConf, expandPaths, loadConf
-from act_client.httpclient import HTTP_BUFFER_SIZE, HTTPClient
 from act_client.operations import (SubmissionInterrupt, getACTRestClient,
                                    getWebDAVClient)
 

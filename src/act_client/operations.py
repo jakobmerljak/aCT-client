@@ -3,19 +3,17 @@ import json
 import logging
 import os
 import queue
-import shutil
 import signal
 import sys
-import zipfile
-from urllib.parse import urlencode, urlparse
+from urllib.parse import urlparse
 
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
+from pyarcrest.http import HTTPClient
+from pyarcrest.x509 import parsePEM, signRequest
 
-from act_client.common import ACTClientError, Signal, deleteFile
-from act_client.httpclient import HTTP_BUFFER_SIZE, HTTPClient
-from act_client.x509proxy import parsePEM, signRequest
+from act_client.common import HTTP_BUFFER_SIZE, ACTClientError, Signal
 from act_client.xrsl import XRSLParser
 
 

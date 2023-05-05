@@ -2,6 +2,10 @@ import os
 import signal
 
 
+# TODO: HARDCODED
+HTTP_BUFFER_SIZE = 2 ** 23  # 8MB
+
+
 def getIDParam(args):
     if not args.all and not args.id:
         raise ACTClientError("No job ID given (use -a/--all) or --id")
