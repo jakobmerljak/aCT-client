@@ -637,7 +637,7 @@ def subcommandCat(args, conf):
             # create a client for the cluster if it does not exist
             if job['a_cluster'] not in clients:
                 try:
-                    httpClient = HTTPClient(url=job['a_cluster'], proxypath=conf['proxy'], logger=actrest.logger)
+                    httpClient = HTTPClient(url=job['a_cluster'], proxypath=conf['proxy'], log=actrest.log)
                 except Exception as exc:
                     print(f'Error creating REST client for ARC cluster {job["a_cluster"]} for job {job["c_id"]} {job["c_jobname"]}: {exc}')
                     continue
@@ -654,7 +654,7 @@ def subcommandCat(args, conf):
                 continue
             if resp.status != 200:
                 text = resp.read().decode()
-                httpClient.logger.debug(f"Response for {url} - {resp.status} {text}")
+                httpClient.log.debug(f"Response for {url} - {resp.status} {text}")
                 try:
                     msg = (json.loads(text))['msg']
                     print(f'Error fetching {infoKey.lower()} from {url} for job {job["c_id"]} {job["c_jobname"]}: {msg}')
