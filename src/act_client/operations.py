@@ -249,10 +249,11 @@ class ACTRest:
             sigint.defer()
 
         # submit jobs to aCT
-        jsonData, status = self.request('POST', '/jobs', token=self.token, jsonData=jsonData)
-        self.log.debug(f"Jobs POST response - {status} {jsonData}")
-        if status != 200:
-            raise ACTClientError(f'Error creating jobs: {jsonData["msg"]}')
+        if jsonData:
+            jsonData, status = self.request('POST', '/jobs', token=self.token, jsonData=jsonData)
+            self.log.debug(f"Jobs POST response - {status} {jsonData}")
+            if status != 200:
+                raise ACTClientError(f'Error creating jobs: {jsonData["msg"]}')
 
         # Parse job descriptions of jobs without errors. Jobs with submission
         # errors are removed from the working set.
@@ -335,7 +336,6 @@ class ACTRest:
     def submitJobs(self, descs, clusterlist, webdavClient, webdavBase):
         results = []
         for batch in _sublistGenerator(descs, size=100):
-            print("Submitting batch of 100 jobs ...")
             try:
                 results.extend(self.submitJobBatch(batch, clusterlist, webdavClient, webdavBase))
             except SubmissionInterrupt as exc:
