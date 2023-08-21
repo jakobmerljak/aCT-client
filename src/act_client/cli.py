@@ -80,19 +80,22 @@ def addWebDAVArg(parser):
 
 
 def createParser():
-    parser = argparse.ArgumentParser()
-    addCommonArgs(parser)
+    parserCommon = argparse.ArgumentParser(add_help=False)
+    addCommonArgs(parserCommon)
 
+    parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest='command')
 
     parserInfo = subparsers.add_parser(
         'info',
-        help='show info about aCT server'
+        help='show info about aCT server',
+        parents=[parserCommon],
     )
 
     parserClean = subparsers.add_parser(
         'clean',
-        help='clean failed, done and donefailed jobs'
+        help='clean failed, done and donefailed jobs',
+        parents=[parserCommon],
     )
     addCommonJobFilterArgs(parserClean)
     addStateArg(parserClean)
@@ -100,13 +103,15 @@ def createParser():
 
     parserFetch = subparsers.add_parser(
         'fetch',
-        help='fetch failed jobs'
+        help='fetch failed jobs',
+        parents=[parserCommon],
     )
     addCommonJobFilterArgs(parserFetch)
 
     parserGet = subparsers.add_parser(
         'get',
-        help='download results of done and donefailed jobs'
+        help='download results of done and donefailed jobs',
+        parents=[parserCommon],
     )
     addCommonJobFilterArgs(parserGet)
     addStateArg(parserGet)
@@ -114,17 +119,18 @@ def createParser():
     parserGet.add_argument(
         '--use-jobname',
         action='store_true',
-        help='name of download dir should be the same as job name'
+        help='name of download dir should be the same as job name',
     )
     parserGet.add_argument(
         '--noclean',
         action='store_true',
-        help='do not clean jobs'
+        help='do not clean jobs',
     )
 
     parserKill = subparsers.add_parser(
         'kill',
-        help='kill jobs'
+        help='kill jobs',
+        parents=[parserCommon],
     )
     addCommonJobFilterArgs(parserKill)
     addStateArg(parserKill)
@@ -132,66 +138,71 @@ def createParser():
 
     parserProxy = subparsers.add_parser(
         'proxy',
-        help='submit proxy certificate'
+        help='submit proxy certificate',
+        parents=[parserCommon],
     )
 
     parserResub = subparsers.add_parser(
         'resub',
-        help='resubmit failed jobs'
+        help='resubmit failed jobs',
+        parents=[parserCommon],
     )
     addCommonJobFilterArgs(parserResub)
 
     parserStat = subparsers.add_parser(
         'stat',
-        help='print status for jobs'
+        help='print status for jobs',
+        parents=[parserCommon],
     )
     addCommonJobFilterArgs(parserStat)
     addStateArg(parserStat)
     parserStat.add_argument(
         '--arc',
         default='JobID,State,arcstate',
-        help='a comma separated list of columns from ARC table'
+        help='a comma separated list of columns from ARC table',
     )
     parserStat.add_argument(
         '--client',
         default='id,jobname',
-        help='a comma separated list of columns from client table'
+        help='a comma separated list of columns from client table',
     )
     parserStat.add_argument(
         '--get-cols',
         action='store_true',
-        help='get a list of possible columns from server'
+        help='get a list of possible columns from server',
     )
 
     parserSub = subparsers.add_parser(
         'sub',
-        help='submit job descriptions'
+        help='submit job descriptions',
+        parents=[parserCommon],
     )
     addWebDAVArg(parserSub)
     parserSub.add_argument(
         '--clusterlist',
         default='default',
-        help='a name of a list of clusters specified in config under "clusters" option OR a comma separated list of cluster URLs'
+        help='a name of a list of clusters specified in config under "clusters" option OR a comma separated list of cluster URLs',
     )
     parserSub.add_argument(
         'xRSL',
         nargs='+',
-        help='path to job description file'
+        help='path to job description file',
     )
 
     parserCat = subparsers.add_parser(
         'cat',
-        help='print stdout or stderr of the job'
+        help='print stdout or stderr of the job',
+        parents=[parserCommon],
     )
     addCommonJobFilterArgs(parserCat)
     addStateArg(parserCat)
     parserCat.add_argument(
         '-o', '--stdout', action='store_true', default=True,
-        help='print job\'s stdout'
+        help='print job\'s stdout',
     )
     parserCat.add_argument(
         '-e', '--stderr', action='store_true',
-        help='print job\'s stderr'
+        help='print job\'s stderr',
     )
 
     return parser
