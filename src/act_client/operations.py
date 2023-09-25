@@ -7,11 +7,8 @@ import signal
 import sys
 from urllib.parse import urlparse
 
-from cryptography import x509
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import serialization
 from pyarcrest.http import HTTPClient
-from pyarcrest.x509 import parsePEM, signRequest
+from pyarcrest.x509 import parseProxyPEM, pemToCSR, signProxyCSR
 
 from act_client.common import HTTP_BUFFER_SIZE, ACTClientError, Signal
 from act_client.xrsl import XRSLParser
@@ -185,10 +182,10 @@ class ACTRest:
             jsonData = json.loads(text)
             raise ACTClientError(f'Error deleting proxy: {jsonData["msg"]}')
 
-    def uploadProxy(self, proxyStr, tokenPath):
+    def uploadProxy(self, proxyPEM, tokenPath):
         # submit proxy cert part to get CSR
-        cert, _, chain = parsePEM(proxyStr)
-        jsonData = {'cert': cert.public_bytes(serialization.Encoding.PEM).decode('utf-8'), 'chain': chain}
+        certPEM, _, chainPEM = parseProxyPEM(proxyPEM)
+        jsonData = {'cert': certPEM, 'chain': chainPEM}
         jsonData, status = self.request('POST', '/proxies', jsonData=jsonData)
         self.log.debug(f"Proxy POST response - {status} {jsonData}")
         if status != 200:
@@ -198,17 +195,17 @@ class ACTRest:
 
         # sign CSR
         try:
-            proxyCert, _, issuerChains = parsePEM(proxyStr)
-            csr = x509.load_pem_x509_csr(jsonData['csr'].encode(), default_backend())
-            cert = signRequest(csr).decode()
-            chain = proxyCert.public_bytes(serialization.Encoding.PEM).decode() + issuerChains + '\n'
+            # do we need a new line at the end of certPEM or/and at the and of chainPEM?
+            chainPEM = certPEM + chainPEM
+            csr = pemToCSR(jsonData['csr'])
+            certPEM = signProxyCSR(csr)
         except Exception as exc:
             self.log.debug(f"Error signing CSR: {exc}")
             self.deleteProxy()
             raise
 
         # upload signed cert
-        jsonData = {'cert': cert, 'chain': chain}
+        jsonData = {'cert': certPEM, 'chain': chainPEM}
         try:
             jsonData, status = self.request('PUT', '/proxies', jsonData=jsonData, token=self.token)
         except Exception as exc:
